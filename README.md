@@ -1,2 +1,2 @@
 # Interactables
-Create stuff idk.
+Plugin for omegga. Create stuff with codeblocks n... That.
