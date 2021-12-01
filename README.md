@@ -17,6 +17,11 @@ Args: (text).
 
 Sends a message to the player.
 
+## kill:
+Args: (none).
+
+Kill the player.
+
 ### teleport:
 Args: (x)(y)(z).
 
