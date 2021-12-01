@@ -1,5 +1,5 @@
 const fs = require('fs');
-const brs = require('brs-js');
+const { brs } = OMEGGA_UTIL;
 
 let brsfile = fs.readFileSync(__dirname + "/brs/Interactable.brs");
 const intrbrick = brs.read(brsfile);
@@ -164,8 +164,7 @@ class Interactables {
 					}
 				}
 			}
-			await this.omegga.saveBricks("allan_remove_this_file");
-			const brsobj = this.omegga.readSaveData("allan_remove_this_file");
+			const brsobj = await this.omegga.getSaveData();
 			//Object.values(brsobj.bricks[3].components).forEach(element => 
 			//console.log(element));
 			const plyrpos = await this.omegga.getPlayer(name).getPosition();
@@ -341,8 +340,7 @@ class Interactables {
 		const sounds = Object.values(soundlist.split("\n"));
 		const publicplayerloclist = await this.omegga.getAllPlayerPositions();
 		for(var i=0;i<publicplayerloclist.length;i++) {
-			await this.omegga.saveBricks("allan_remove_this_file");
-			const brsobj = this.omegga.readSaveData("allan_remove_this_file");
+			const brsobj = await this.omegga.getSaveData();
 			const plyrpos = publicplayerloclist[i].pos;
 			for(var i2=0;i2<brsobj.brick_count;i2++) {
 				let brickowner = brsobj.brick_owners[brsobj.bricks[i2].owner_index - 1];
