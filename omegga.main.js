@@ -252,7 +252,6 @@ class Interactables {
 				else {
 					this.omegga.whisper(name,"One of the arguments must be a number.");
 				}
-				await this.omegga.saveBricks("allan_remove_this_file");
 			}
 			else {
 				this.omegga.whisper(name,args[0]+" doesn't exist.");
