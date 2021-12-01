@@ -330,7 +330,7 @@ class Interactables {
 				this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
 			}
 		});
-		this.interval = setInterval(() => this.tickhandler(),500);
+		//this.interval = setInterval(() => this.tickhandler(),500);
 		return { registeredCommands: ['place','use','codehelp'] };
 	}
 	
@@ -361,7 +361,7 @@ class Interactables {
 	
 	
 	async stop() {
-		clearInterval(this.interval);
+		//clearInterval(this.interval);
 		this.omegga.removeAllListeners('cmd:use');
 		this.omegga.removeAllListeners('cmd:place');
 		this.omegga.removeAllListeners('cmd:codehelp');
