@@ -1,0 +1,37 @@
+{
+  "name": "Interactables",
+  "description": "Make your stuff interactable!",
+  "author": "Bluester16",
+  "config": {
+    "Trusted": {
+      "description": "Players that you trust to place down codeblocks.",
+      "default": "",
+      "type": "players"
+    }
+  },
+  "commands": [
+    {
+      "name": "/use",
+      "description": "Use it near a trigger to activate functions.",
+      "example": "use",
+      "args": []
+    },
+    {
+      "name": "/place",
+      "description": "Place codeblocks at the location of your ghost brick.",
+      "example": "place message Hello world!",
+      "args": [
+        {
+          "name": "Codeblock name",
+          "description": "Name of a codeblock you want to place.",
+          "required": true
+        },
+        {
+          "name": "args...",
+          "description": "Args. Amount and type depends on the codeblock.",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

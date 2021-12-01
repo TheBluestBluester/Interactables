@@ -1,0 +1,22 @@
+BA_AirRaidSiren1
+BA_AMB_Component_Alarm_Scifi_Creepy
+BA_AMB_Component_Alarm_Scifi_Warning_1
+BA_AMB_Component_Alarm_Scifi_Warning_2
+BA_AMB_Component_Alarm_Scifi_Warning_3
+BA_NeonLight1
+BA_AMB_Component_Air_Conditioning_Buzzy_1
+BA_AMB_Component_Air_Conditioning_Buzzy_2
+BA_AMB_Component_Air_Conditioning_Grungy
+BA_AMB_Component_Air_Conditioning_Wobbly
+BA_AMB_Component_Fires_Fireplace_1
+BA_AMB_Component_Hospital_Misc_Respirator
+BA_AMB_Component_Hospital_Monitors_Heart_1
+BA_AMB_Component_Hospital_Monitors_Heart_2
+BA_AMB_Component_Hospital_Monitors_Heart_3
+BA_AMB_Component_Automated_Vending
+BA_RadioStatic1
+BA_Old_Computer
+BA_Printer
+
+Because the names of sounds are stupid long and the way this entire system works is that it puts descriptions on the brick's owners which has a character limit so i have to do this.
+19
