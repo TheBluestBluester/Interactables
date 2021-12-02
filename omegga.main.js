@@ -11,6 +11,9 @@ const soundlist = fs.readFileSync(__dirname + "/misc/Sound_list.txt", 'utf8');
 const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone"];
 const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~"];
 const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12];
+const collideoptions = [{ player: false, weapon: false, interaction: false, tool: true },{ player: true, weapon: true, interaction: true, tool: true }];
+
+//Y'know what's nice about having fun with programming is that you can code for days without getting bored of it. The downside ofcourse being that you can code for days without getting bored of it. Because my forehead says no.
 
 class Interactables {
 	
@@ -139,6 +142,43 @@ class Interactables {
 								}
 							}
 						}
+						if(description2[0] == "ud") {
+							let doors = {...brsobj,bricks:[],brick_count: 0};
+							for(let i3=0;i3<brsobj.brick_count;i3++) {
+								brickowner2 = brsobj.brick_owners[brsobj.bricks[i3].owner_index - 1];
+								if(brickowner2 !== 'undefined') {
+									brickowner2 = brsobj.brick_owners[brsobj.bricks[i3].owner_index - 1].name;
+									if(brickowner2 !== 'undefined') {
+										if(brickowner2.indexOf("door~") == 0) {
+											if(brickowner2.substr(5,brickowner.length) == description2[2]) {
+												doors.bricks.push(brsobj.bricks[i3]);
+												doors.brick_count = doors.brick_count + 1;
+											}
+										}
+									}
+								}
+							}
+							for(let i3=0;i3<doors.brick_count;i3++) {
+								let door = doors.bricks[i3];
+								if(door.visibility && (description2[1] == "0" || description2[1] == "2")) {
+									doors.bricks[i3].visibility = false;
+									doors.bricks[i3].collision = collideoptions[0];
+								}
+								else if(!door.visibility && (description2[1] == "1" || description2[1] == "2")) {
+									doors.bricks[i3].visibility = true;
+									doors.bricks[i3].collision = collideoptions[1];
+								}
+								if(i3 == 0) {
+									this.omegga.clearBricks(doors.brick_owners[doors.bricks[i3].owner_index - 1].id,{quiet: true});
+								}
+							}
+							if(doors.brick_count > 0) {
+								function addbrik(omegga) {
+									omegga.loadSaveData(doors,{quiet: true});
+								}
+								setTimeout(() => addbrik(this.omegga), 10);
+							}
+						}
 						detected = true;
 						funcpos = [funcpos[0]+10,funcpos[1],funcpos[2]];
 					}
@@ -165,7 +205,7 @@ class Interactables {
 				}
 			}
 			const brsobj = await this.omegga.getSaveData();
-			//Object.values(brsobj.bricks[3].components).forEach(element => 
+			//Object.values(brsobj.bricks[0]).forEach(element => 
 			//console.log(element));
 			const plyrpos = await this.omegga.getPlayer(name).getPosition();
 			for(var i=0;i<brsobj.brick_count;i++) {
@@ -257,81 +297,8 @@ class Interactables {
 				this.omegga.whisper(name,args[0]+" doesn't exist.");
 			}
 		});
-		this.omegga.on('cmd:codehelp', async (name, ...args) => {
-			if(args.length > 0) {
-				if(args[0] == "function") {
-					this.omegga.whisper(name,"args: (name)");
-					this.omegga.whisper(name,"Used by triggers to execute code. Code is always executed north (aka where player faces on spawning).");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "trigger") {
-					this.omegga.whisper(name,"args: (mode) (function name)");
-					this.omegga.whisper(name,"Executes the specified function. To use the trigger do /use near it. Triggers with mode set to 1 will act as a code block. Howveres you will nolomger be ab;e to use /use on it.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "message") {
-					this.omegga.whisper(name,"args: (message)");
-					this.omegga.whisper(name,"Sends a message to the player.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "kill") {
-					this.omegga.whisper(name,"args: (none)");
-					this.omegga.whisper(name,"Kills the player.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "teleport" || args[0] == "tp") {
-					this.omegga.whisper(name,"args: (x) (y) (z)");
-					this.omegga.whisper(name,"Teleports the player to set coordinets.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "rltp") {
-					this.omegga.whisper(name,"args: (x) (y) (z)");
-					this.omegga.whisper(name,"Teleports the player relative to player's current position.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "heal") {
-					this.omegga.whisper(name,"args: (none)");
-					this.omegga.whisper(name,"Heals the player by 25 hp.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "door" || args[0] == "usedoor" || args[0] == "zone") {
-					this.omegga.whisper(name,"args: (none)");
-					this.omegga.whisper(name,"This is not functional yet.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "delay") {
-					this.omegga.whisper(name,"args: (amount)");
-					this.omegga.whisper(name,"Delays all code blocks after it by an amount. A second is 1000 ticks.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "broadcast") {
-					this.omegga.whisper(name,"args: (message)");
-					this.omegga.whisper(name,"Send a message to all players.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "playsound") {
-					this.omegga.whisper(name,"args: (id) (volume) (pitch) (duration)");
-					this.omegga.whisper(name,"Plays sound.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else if(args[0] == "repeat") {
-					this.omegga.whisper(name,"args: (mode) (number)");
-					this.omegga.whisper(name,"Repeats code blocks. Setting mode to 0 will mark this as a start of the repeat loop. Setting mode to 1 will mark the block as the end.");
-					this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-				}
-				else {
-					this.omegga.whisper(name,args[0]+" block doesn't exist.");
-				}
-			}
-			else {
-				this.omegga.whisper(name,"Blocks:");
-				Object.values(brickfuncs).forEach(element => 
-				this.omegga.whisper(name,element));
-				this.omegga.whisper(name,"Use PgUp or PgDn to scroll up or down.");
-			}
-		});
-		//this.interval = setInterval(() => this.tickhandler(),500);
-		return { registeredCommands: ['place','use','codehelp'] };
+		this.interval = setInterval(() => this.tickhandler(),500);
+		return { registeredCommands: ['place','use'] };
 	}
 	
 	
@@ -340,17 +307,22 @@ class Interactables {
 		const publicplayerloclist = await this.omegga.getAllPlayerPositions();
 		for(var i=0;i<publicplayerloclist.length;i++) {
 			const brsobj = await this.omegga.getSaveData();
-			const plyrpos = publicplayerloclist[i].pos;
-			for(var i2=0;i2<brsobj.brick_count;i2++) {
-				let brickowner = brsobj.brick_owners[brsobj.bricks[i2].owner_index - 1];
-				if(typeof brickowner !== 'undefined') {
-					brickowner = brsobj.brick_owners[brsobj.bricks[i2].owner_index - 1].name;
+			//In great memory of: allan_remove_this_file
+			if(typeof brsobj !== 'undefined') {
+				const plyrpos = publicplayerloclist[i].pos;
+				for(var i2=0;i2<brsobj.brick_count;i2++) {
+					let brickowner = brsobj.brick_owners[brsobj.bricks[i2].owner_index - 1];
 					if(typeof brickowner !== 'undefined') {
-					if(brickowner.indexOf("zn~") == 0) {
-						const brickpos = brsobj.bricks[i2].position;
-						const size = brsobj.bricks[i2].size;
-						if(plyrpos[0] > brickpos[0] && plyrpos[0] < brickpos[0] + size[0]*2 && plyrpos[1] > brickpos[1] && plyrpos[1] < brickpos[1] + size[1]*2 && plyrpos[2]+5 > brickpos[2] && plyrpos[2] < brickpos[2] + size[2]*2) {
-								this.runfunctionsnstuff(brsobj,plyrpos,"zn~0~"+brickowner.split("~")[1],publicplayerloclist[i].player.name,sounds);
+						brickowner = brsobj.brick_owners[brsobj.bricks[i2].owner_index - 1].name;
+						if(typeof brickowner !== 'undefined') {
+						if(brickowner.indexOf("zn~") == 0) {
+							const rotation = brsobj.bricks[i2].rotation;
+							//console.log(rotation);
+							const brickpos = brsobj.bricks[i2].position;
+							let size = brsobj.bricks[i2].size;
+							if(plyrpos[0] >= brickpos[0] && plyrpos[0] <= brickpos[0] + size[0]*2 && plyrpos[1] >= brickpos[1] && plyrpos[1] <= brickpos[1] + size[1]*2 && plyrpos[2]+5 > brickpos[2] && plyrpos[2] <= brickpos[2] + size[2]*2) {
+									this.runfunctionsnstuff(brsobj,plyrpos,"zn~0~"+brickowner.split("~")[1],publicplayerloclist[i].player.name,sounds);
+								}
 							}
 						}
 					}
@@ -361,7 +333,7 @@ class Interactables {
 	
 	
 	async stop() {
-		//clearInterval(this.interval);
+		clearInterval(this.interval);
 		this.omegga.removeAllListeners('cmd:use');
 		this.omegga.removeAllListeners('cmd:place');
 		this.omegga.removeAllListeners('cmd:codehelp');
