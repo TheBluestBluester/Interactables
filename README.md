@@ -58,7 +58,7 @@ Args: (mode number)(amount).
 Repeats codeblocks. Mode 0 blocks will act as a start of a loop. Mode 1 blocks will act as an end of a loop.
 
 ## Planned features:
-- [ ] Doors.
+- [X] Doors.
 - [ ] Item spawning.
 - [ ] Zones.
 - [ ] Minigame event triggers.
