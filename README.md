@@ -57,6 +57,16 @@ Args: (mode number)(amount).
 
 Repeats codeblocks. Mode 0 blocks will act as a start of a loop. Mode 1 blocks will act as an end of a loop.
 
+### door:
+Args: (name).
+
+Places a door.
+
+### usedoor.
+Args: (mode)(doorname).
+
+Open or closes doors. Mode 0 opens doors. Mode 1 closes doors. Mode 2 toggles doors.
+
 ## Planned features:
 - [X] Doors.
 - [ ] Item spawning.
