@@ -72,3 +72,4 @@ Open or closes doors. Mode 0 opens doors. Mode 1 closes doors. Mode 2 toggles do
 - [ ] Item spawning.
 - [ ] Zones.
 - [ ] Minigame event triggers.
+- [ ] Variables and if blocks.
