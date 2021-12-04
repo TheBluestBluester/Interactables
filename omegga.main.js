@@ -15,6 +15,8 @@ const collideoptions = [{ player: false, weapon: false, interaction: false, tool
 
 //Y'know what's nice about having fun with programming is that you can code for days without getting bored of it. The downside ofcourse being that you can code for days without getting bored of it. Because my forehead says no.
 
+//Seriosly help i can't resist.
+
 class Interactables {
 	
 	constructor(omegga, config, store) {
@@ -308,7 +310,9 @@ class Interactables {
 		for(var i=0;i<publicplayerloclist.length;i++) {
 			const brsobj = await this.omegga.getSaveData();
 			//In great memory of: allan_remove_this_file
-			if(typeof brsobj !== 'undefined') {
+			//      _
+			//( -_-)/
+			if(typeof brsobj !== 'undefined' && !publicplayerloclist[i].isDead) {
 				const plyrpos = publicplayerloclist[i].pos;
 				for(var i2=0;i2<brsobj.brick_count;i2++) {
 					let brickowner = brsobj.brick_owners[brsobj.bricks[i2].owner_index - 1];
@@ -320,7 +324,10 @@ class Interactables {
 							//console.log(rotation);
 							const brickpos = brsobj.bricks[i2].position;
 							let size = brsobj.bricks[i2].size;
-							if(plyrpos[0] >= brickpos[0] && plyrpos[0] <= brickpos[0] + size[0]*2 && plyrpos[1] >= brickpos[1] && plyrpos[1] <= brickpos[1] + size[1]*2 && plyrpos[2]+5 > brickpos[2] && plyrpos[2] <= brickpos[2] + size[2]*2) {
+							if(rotation%2 == 1) {
+								size = [size[1],size[0],size[2]];
+							}
+							if(plyrpos[0]+5 >= brickpos[0] - size[0] && plyrpos[0]-5 <= brickpos[0] + size[0] && plyrpos[1]+5 >= brickpos[1] - size[1] && plyrpos[1]-5 <= brickpos[1] + size[1] && plyrpos[2]+12 >= brickpos[2] - size[2] && plyrpos[2]-12 <= brickpos[2] + size[2]) {
 									this.runfunctionsnstuff(brsobj,plyrpos,"zn~0~"+brickowner.split("~")[1],publicplayerloclist[i].player.name,sounds);
 								}
 							}
