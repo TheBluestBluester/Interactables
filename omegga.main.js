@@ -299,7 +299,7 @@ class Interactables {
 				this.omegga.whisper(name,args[0]+" doesn't exist.");
 			}
 		});
-		this.interval = setInterval(() => this.tickhandler(),500);
+		this.interval = setInterval(() => this.tickhandler(),100);
 		return { registeredCommands: ['place','use'] };
 	}
 	
