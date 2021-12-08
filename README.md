@@ -84,3 +84,4 @@ Prevents functions from running. Mode 0 disables functions. Mode 1 reenables the
 - [ ] Minigame event triggers.
 - [ ] Variables and if blocks.
 - [X] Function blacklisting.
+- [ ] Message extantion.
