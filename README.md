@@ -78,3 +78,4 @@ Activates functions whenever a player is inside of one. To resize the zone simpl
 - [X] Zones.
 - [ ] Minigame event triggers.
 - [ ] Variables and if blocks.
+- [ ] Function blacklisting.
