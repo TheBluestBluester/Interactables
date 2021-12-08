@@ -7,24 +7,27 @@ brsfile = fs.readFileSync(__dirname + "/brs/heal.brs");
 const healbrick = brs.read(brsfile);
 brsfile = fs.readFileSync(__dirname + "/brs/audio.brs");
 const soundbrick = brs.read(brsfile);
+let globalbrs = {};
 const soundlist = fs.readFileSync(__dirname + "/misc/Sound_list.txt", 'utf8');
-const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone"];
-const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~"];
-const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12];
+const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone","blacklist"];
+const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~","bl~"];
+const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11];
 const collideoptions = [{ player: false, weapon: false, interaction: false, tool: true },{ player: true, weapon: true, interaction: true, tool: true }];
+let blacklist = [];
+let ticks = 0;
 
 //Y'know what's nice about having fun with programming is that you can code for days without getting bored of it. The downside ofcourse being that you can code for days without getting bored of it. Because my forehead says no.
 
 //Seriosly help i can't resist.
 
 class Interactables {
-	
+
 	constructor(omegga, config, store) {
 		this.omegga = omegga;
 		this.config = config;
 		this.store = store;
 	}
-	
+
 	async runfunctionsnstuff(brsobj,plyrpos,brickowner,name,sounds) {
 		let funcname = brickowner.split("~")[2];
 				let funcpos = [];
@@ -35,7 +38,7 @@ class Interactables {
 					if(brickowner2 !== 'undefined') {
 						brickowner2 = brsobj.brick_owners[brsobj.bricks[i2].owner_index - 1].name;
 						if(brickowner2 !== 'undefined') {
-							if(brickowner2.indexOf("fn~") == 0) {
+							if(brickowner2.indexOf("fn~") == 0 && brickowner2.substr(3,brickowner.length) == funcname) {
 								if(brickowner2.substr(3,brickowner.length) == funcname) {
 									detected = true;
 									funcpos = brsobj.bricks[i2].position;
@@ -50,7 +53,7 @@ class Interactables {
 					this.omegga.whisper(name,"The function that is bound to this trigger does not exist.");
 				}
 				let looplist = [];
-				while(detected) {
+				while(detected && !blacklist.includes(funcname)) {
 					playerpos = await this.omegga.getPlayer(name).getPosition();
 					detected = false;
 					function delay(ms) {
@@ -70,7 +73,7 @@ class Interactables {
 						if(description2[0] == "br") {
 							description2.shift();
 							description2 = description2.join("_");
-							const text = description2.split("_");
+							const text= description2.split("_");
 							this.omegga.broadcast(text.join(" "));
 						}
 						if(description2[0] == "kl") {
@@ -88,12 +91,11 @@ class Interactables {
 							let bricktoplace = {...healbrick,brick_owners:[{id: "00000000-0000-0000-0000-100000000000",name:"heal",bricks: 0}]};
 							bricktoplace.bricks[0].position = pos;
 							this.omegga.loadSaveData(bricktoplace, {quiet: true});
-							setTimeout(() => removbrik(this.omegga), 100);
 						}
 						if(description2[0] == "rt") {
 							let pos = description2[1].split(",");
-							pos = pos.map(function (x) { 
-								return parseInt(x, 10); 
+							pos = pos.map(function (x) {
+								return parseInt(x, 10);
 							});
 							pos = [pos[0]+playerpos[0],pos[1]+playerpos[1],pos[2]+playerpos[2]];
 							this.omegga.writeln(`Chat.Command /TP "${name}" ${pos.join(" ")}`);
@@ -117,7 +119,7 @@ class Interactables {
 								const pos = [Math.round(playerpos[0]),Math.round(playerpos[1]),Math.round(playerpos[2])];
 								if(description2.length >= 8) {
 									brick.bricks[0].position = [description2[5],description2[6],description2[7]];
-								}	
+								}
 								else {
 									brick.bricks[0].position = pos;
 								}
@@ -181,13 +183,23 @@ class Interactables {
 								setTimeout(() => addbrik(this.omegga), 10);
 							}
 						}
+						if(description2[0] == "bl") {
+							if(description2[1] == 0 && !blacklist.includes(description2[0])) {
+								blacklist.push(description2[2]);
+								console.log(blacklist.indexOf(description2[2]));
+							}
+							if(description2[1] == 1){
+								blacklist.splice(blacklist.indexOf(description2[2]),1);
+								console.log(blacklist.indexOf(description2[2]));
+							}
+						}
 						detected = true;
 						funcpos = [funcpos[0]+10,funcpos[1],funcpos[2]];
 					}
 				}
 			}
 	}
-	
+
 	async init() {
 		const sounds = Object.values(soundlist.split("\n"));
 		this.omegga.on('cmd:use', async name => {
@@ -206,8 +218,8 @@ class Interactables {
 					}
 				}
 			}
-			const brsobj = await this.omegga.getSaveData();
-			//Object.values(brsobj.bricks[0]).forEach(element => 
+			const brsobj = globalbrs;
+			//Object.values(brsobj.bricks[0]).forEach(element =>
 			//console.log(element));
 			const plyrpos = await this.omegga.getPlayer(name).getPosition();
 			for(var i=0;i<brsobj.brick_count;i++) {
@@ -220,6 +232,7 @@ class Interactables {
 						if(brickpos[0]<plyrpos[0]+25 && brickpos[0]>plyrpos[0]-25 && brickpos[1]<plyrpos[1]+25 && brickpos[1]>plyrpos[1]-25 && brickpos[2]<plyrpos[2]+36 && brickpos[2]>plyrpos[2]-28) {
 								const valuecheck = brickowner.split("~");
 								if(!isdead && valuecheck[1] == "0") {
+									//this.omegga.whisper(name,"test");
 									this.runfunctionsnstuff(brsobj,plyrpos,brickowner,name,sounds);
 								}
 								foundtriggers = true;
@@ -234,7 +247,7 @@ class Interactables {
 			if(isdead) {
 				this.omegga.whisper(name,"You can't use anything while dead.");
 			}
-			
+
 		});
 		this.omegga.on('cmd:place', async (name, ...args) => {
 			function random(min, max) {
@@ -258,10 +271,10 @@ class Interactables {
 				}
 				if(description == "tp~" || description == "rt~" || description == "ps~" || description == "rp~") {
 					args.shift();
-					args.map(function (x) { 
-						return parseInt(x, 10); 
+					args.map(function (x) {
+						return parseInt(x, 10);
 					});
-					args.forEach(element => 
+					args.forEach(element =>
 					checkifnan(element));
 					if(description !== "ps~" && description !== "rp~") {
 						description = description + args.join(",");
@@ -273,7 +286,7 @@ class Interactables {
 						}
 					}
 				}
-				if(description == "tr~" || description == "ud~") {
+				if(description == "tr~" || description == "ud~" || description == "bl~") {
 					description = description + parseInt(args[1],10) + "~";
 					checkifnan(parseInt(args[1],10));
 					args.shift(); args.shift();
@@ -299,16 +312,23 @@ class Interactables {
 				this.omegga.whisper(name,args[0]+" doesn't exist.");
 			}
 		});
-		//this.interval = setInterval(() => this.tickhandler(),200);
-		return { registeredCommands: ['place','use'] };
+		this.omegga.on('cmd:clearblacklist', async name => {
+			blacklist = [];
+			this.omegga.whisper(name,"Blacklist cleared.");
+		});
+		this.interval = setInterval(() => this.tickhandler(),500);
+		return { registeredCommands: ['place','use','clearblacklist'] };
 	}
-	
-	
+
+
 	async tickhandler() {
 		const sounds = Object.values(soundlist.split("\n"));
 		const publicplayerloclist = await this.omegga.getAllPlayerPositions();
+		if(ticks%2 == 0) {
+			globalbrs = await this.omegga.getSaveData();
+		}
 		for(var i=0;i<publicplayerloclist.length;i++) {
-			const brsobj = await this.omegga.getSaveData();
+			const brsobj = globalbrs;
 			//In great memory of: allan_remove_this_file
 			//      _
 			//( -_-)/
@@ -336,14 +356,15 @@ class Interactables {
 				}
 			}
 		}
+		ticks++;
 	}
-	
-	
+
+
 	async stop() {
 		clearInterval(this.interval);
 		this.omegga.removeAllListeners('cmd:use');
 		this.omegga.removeAllListeners('cmd:place');
-		this.omegga.removeAllListeners('cmd:codehelp');
+		this.omegga.removeAllListeners('cmd:clearblacklist');
 	}
 }
 module.exports = Interactables;
