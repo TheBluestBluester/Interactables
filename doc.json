@@ -5,7 +5,7 @@
   "config": {
     "Trusted": {
       "description": "Players that you trust to place down codeblocks.",
-      "default": "",
+      "default": [],
       "type": "players"
     }
   },
@@ -32,6 +32,12 @@
           "required": false
         }
       ]
+    },
+    {
+      "name": "/clearblacklist",
+      "description": "Clear blacklist.",
+      "example": "clearblacklist",
+      "args": []
     }
   ]
 }
