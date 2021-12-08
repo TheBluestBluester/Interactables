@@ -63,7 +63,7 @@ Args: (name).
 Places a door.
 
 ### usedoor:
-Args: (mode)(doorname).
+Args: (mode)(door name).
 
 Open or closes doors. Mode 0 opens doors. Mode 1 closes doors. Mode 2 toggles doors.
 
@@ -72,10 +72,15 @@ Args: (function name).
 
 Activates functions whenever a player is inside of one. To resize the zone simply resize the brick itself.
 
+### blacklist:
+Args: (mode)(function name)
+
+Prevents functions from running. Mode 0 disables functions. Mode 1 reenables them.
+
 ## Planned features:
 - [X] Doors.
 - [ ] Item spawning.
 - [X] Zones.
 - [ ] Minigame event triggers.
 - [ ] Variables and if blocks.
-- [ ] Function blacklisting.
+- [X] Function blacklisting.
