@@ -15,7 +15,7 @@ Activates functions. Mode 1 triggers can be executed in a code line, however the
 ### message:
 Args: (text).
 
-Sends a message to the player.
+Sends a message to the player. If your message doesn't fit in one codeblock you can extend them by stacking.
 
 ## kill:
 Args: (none).
@@ -45,7 +45,7 @@ Delays all codeblocks after it. 1 second is 1000 ticks.
 ### broadcast:
 Args: (text).
 
-Sends a message to all players.
+Sends a message to all players. If your message doesn't fit in one codeblock you can extend them by stacking.
 
 ### playsound:
 Args: (id)(volume)(pitch)(duration) optional: (x)(y)(z).
@@ -82,6 +82,6 @@ Prevents functions from running. Mode 0 disables functions. Mode 1 reenables the
 - [ ] Item spawning.
 - [X] Zones.
 - [ ] Minigame event triggers.
-- [ ] Variables and if blocks.
+- [ ] Variables and condition blocks.
 - [X] Function blacklisting.
-- [ ] Message extention.
+- [X] Message extention.
