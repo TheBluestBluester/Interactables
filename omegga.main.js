@@ -96,8 +96,27 @@ class Interactables {
 						if(description2[0] == "br") {
 							description2.shift();
 							description2 = description2.join("_");
-							const text= description2.split("_");
-							this.omegga.broadcast(text.join(" "));
+							let text = description2.split("_").join(" ");
+							let funcpos2 = [funcpos[0]+10,funcpos[1]-10,funcpos[2]];
+							let detected2 = true;
+							while(detected2) {
+							detected2 = false;
+							for(var i3=0;i3<brsobj.brick_count;i3++) {
+								if(brsobj.bricks[i3].position[0] == funcpos2[0] && brsobj.bricks[i3].position[1] == funcpos2[1] && brsobj.bricks[i3].position[2] == funcpos2[2]) {	
+									const brickowner3 = brsobj.brick_owners[brsobj.bricks[i3].owner_index - 1].name;
+									let description3 = brickowner3.split("~");
+									if(description3[0] == "br") {
+										description3.shift();
+										description3 = description3.join("_");
+										text = text + description3.split("_").join(" ");
+										detected2 = true;
+									}
+								}
+								
+							}
+							funcpos2 = [funcpos2[0],funcpos2[1]-10,funcpos2[2]];
+							}
+							this.omegga.broadcast(text);
 						}
 						if(description2[0] == "kl") {
 							this.omegga.writeln(`Chat.Command /TP "${name}" ${[100000000,0,0].join(" ")}`);
