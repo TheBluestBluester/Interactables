@@ -72,17 +72,15 @@ class Interactables {
 							description2.shift();
 							description2 = description2.join("_");
 							let text = description2.split("_").join(" ");
-							let funcpos2 = [funcpos[0],funcpos[1]+10,funcpos[2]];
+							let funcpos2 = [funcpos[0]+10,funcpos[1]-10,funcpos[2]];
 							let detected2 = true;
 							while(detected2) {
 							detected2 = false;
 							for(var i3=0;i3<brsobj.brick_count;i3++) {
-								if(brsobj.bricks[i3].position[0] == funcpos2[0] && brsobj.bricks[i3].position[1] == funcpos2[1] && brsobj.bricks[i3].position[2] == funcpos2[2]) {
-									console.log(brsobj.bricks[i3].position,funcpos2);	
+								if(brsobj.bricks[i3].position[0] == funcpos2[0] && brsobj.bricks[i3].position[1] == funcpos2[1] && brsobj.bricks[i3].position[2] == funcpos2[2]) {	
 									const brickowner3 = brsobj.brick_owners[brsobj.bricks[i3].owner_index - 1].name;
 									let description3 = brickowner3.split("~");
 									if(description3[0] == "ms") {
-										console.log(description3);
 										description3.shift();
 										description3 = description3.join("_");
 										text = text + description3.split("_").join(" ");
@@ -91,7 +89,7 @@ class Interactables {
 								}
 								
 							}
-							funcpos2 = [funcpos2[0],funcpos2[1]+10,funcpos2[2]];
+							funcpos2 = [funcpos2[0],funcpos2[1]-10,funcpos2[2]];
 							}
 							this.omegga.whisper(name,text);
 						}
@@ -226,6 +224,8 @@ class Interactables {
 	}
 
 	async init() {
+		console.warn("DO NOT FORGET TO CLEAR TEMP FILES FROM YOUR SAVES FOLDER.");
+		console.log("Trust me you don't want to endup with 300k files like it happened to me. And this plugin generates a lot of them.");
 		const sounds = Object.values(soundlist.split("\n"));
 		this.omegga.on('cmd:use', async name => {
 			let foundtriggers = false;
