@@ -7,14 +7,14 @@ brsfile = fs.readFileSync(__dirname + "/brs/heal.brs");
 const healbrick = brs.read(brsfile);
 brsfile = fs.readFileSync(__dirname + "/brs/audio.brs");
 const soundbrick = brs.read(brsfile);
-let globalbrs = {};
 const soundlist = fs.readFileSync(__dirname + "/misc/Sound_list.txt", 'utf8');
 const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone","blacklist"];
 const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~","bl~"];
 const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11];
 const collideoptions = [{ player: false, weapon: false, interaction: false, tool: true },{ player: true, weapon: true, interaction: true, tool: true }];
+let trusted = [];
 let blacklist = [];
-let ticks = 0;
+let variables = [];
 
 //Y'know what's nice about having fun with programming is that you can code for days without getting bored of it. The downside ofcourse being that you can code for days without getting bored of it. Because my forehead says no.
 
@@ -26,6 +26,10 @@ class Interactables {
 		this.omegga = omegga;
 		this.config = config;
 		this.store = store;
+		trusted = this.config.Trusted;
+		if(!trusted) {
+			trusted = [];
+		}
 	}
 
 	async runfunctionsnstuff(brsobj,plyrpos,brickowner,name,sounds) {
@@ -67,8 +71,29 @@ class Interactables {
 						if(description2[0] == "ms") {
 							description2.shift();
 							description2 = description2.join("_");
-							const text = description2.split("_");
-							this.omegga.whisper(name,text.join(" "));
+							let text = description2.split("_").join(" ");
+							let funcpos2 = [funcpos[0],funcpos[1]+10,funcpos[2]];
+							let detected2 = true;
+							while(detected2) {
+							detected2 = false;
+							for(var i3=0;i3<brsobj.brick_count;i3++) {
+								if(brsobj.bricks[i3].position[0] == funcpos2[0] && brsobj.bricks[i3].position[1] == funcpos2[1] && brsobj.bricks[i3].position[2] == funcpos2[2]) {
+									console.log(brsobj.bricks[i3].position,funcpos2);	
+									const brickowner3 = brsobj.brick_owners[brsobj.bricks[i3].owner_index - 1].name;
+									let description3 = brickowner3.split("~");
+									if(description3[0] == "ms") {
+										console.log(description3);
+										description3.shift();
+										description3 = description3.join("_");
+										text = text + description3.split("_").join(" ");
+										detected2 = true;
+									}
+								}
+								
+							}
+							funcpos2 = [funcpos2[0],funcpos2[1]+10,funcpos2[2]];
+							}
+							this.omegga.whisper(name,text);
 						}
 						if(description2[0] == "br") {
 							description2.shift();
@@ -218,7 +243,10 @@ class Interactables {
 					}
 				}
 			}
-			const brsobj = globalbrs;
+			const brsobj = await this.omegga.getSaveData();
+			if(typeof brsobj == 'undefined') {
+				return;
+			}
 			//Object.values(brsobj.bricks[0]).forEach(element =>
 			//console.log(element));
 			const plyrpos = await this.omegga.getPlayer(name).getPosition();
@@ -250,6 +278,12 @@ class Interactables {
 
 		});
 		this.omegga.on('cmd:place', async (name, ...args) => {
+			if(trusted.length > 0) {
+				if(!trusted.some(a => a.name == name)) {
+					await this.omegga.whisper(name,"You are not trusted enouph to place codeblocks.");
+					return;
+				}
+			}
 			function random(min, max) {
 				return Math.floor(Math.random() * (max + 1 - min) + min);
 			}
@@ -316,19 +350,20 @@ class Interactables {
 			blacklist = [];
 			this.omegga.whisper(name,"Blacklist cleared.");
 		});
+		this.omegga.on('cmd:test', async name => {
+			const minigames = await this.omegga.getMinigames();
+			this.omegga.whisper(name,minigames);
+		});
 		this.interval = setInterval(() => this.tickhandler(),500);
-		return { registeredCommands: ['place','use','clearblacklist'] };
+		return { registeredCommands: ['place','use','clearblacklist','test'] };
 	}
 
 
 	async tickhandler() {
 		const sounds = Object.values(soundlist.split("\n"));
 		const publicplayerloclist = await this.omegga.getAllPlayerPositions();
-		if(ticks%2 == 0) {
-			globalbrs = await this.omegga.getSaveData();
-		}
+		const brsobj = await this.omegga.getSaveData();
 		for(var i=0;i<publicplayerloclist.length;i++) {
-			const brsobj = globalbrs;
 			//In great memory of: allan_remove_this_file
 			//      _
 			//( -_-)/
@@ -356,7 +391,6 @@ class Interactables {
 				}
 			}
 		}
-		ticks++;
 	}
 
 
@@ -364,6 +398,7 @@ class Interactables {
 		clearInterval(this.interval);
 		this.omegga.removeAllListeners('cmd:use');
 		this.omegga.removeAllListeners('cmd:place');
+		this.omegga.removeAllListeners('cmd:test');
 		this.omegga.removeAllListeners('cmd:clearblacklist');
 	}
 }
