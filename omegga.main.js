@@ -373,7 +373,7 @@ class Interactables {
 			const minigames = await this.omegga.getMinigames();
 			this.omegga.whisper(name,minigames);
 		});
-		this.interval = setInterval(() => this.tickhandler(),500);
+		this.interval = setInterval(() => this.tickhandler(),1000);
 		return { registeredCommands: ['place','use','clearblacklist','test'] };
 	}
 
