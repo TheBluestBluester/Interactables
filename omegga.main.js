@@ -170,7 +170,7 @@ class Interactables {
 								bool = !bool;
 							}
 							if(!bool) {
-								funcpos = [funcpos[0], funcpos[1]+20, funcpos[2]];
+								funcpos = [funcpos[0]-10, funcpos[1]+20, funcpos[2]];
 							}
 						}
 						if(description2[0] == "kl") {
