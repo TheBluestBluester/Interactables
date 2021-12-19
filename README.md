@@ -112,6 +112,6 @@ Compares 2 variables/values on top of it by using 'setvariable'. Setting invert 
 - [ ] Item spawning.
 - [X] Zones.
 - [ ] Minigame event triggers.
-- [ ] Variables and condition blocks.
+- [ ] Variables and condition blocks. (WIP)
 - [X] Function blacklisting.
 - [X] Message extention.
