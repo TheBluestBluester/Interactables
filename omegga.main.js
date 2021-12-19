@@ -355,7 +355,7 @@ class Interactables {
 	}
 
 	async init() {
-	trusted.push(this.omegga.host);
+	//trusted.push(this.omegga.host);
 		console.warn("DO NOT FORGET TO CLEAR TEMP FILES FROM YOUR SAVES FOLDER.");
 		console.log("Trust me you don't want to endup with 300k files like it happened to me. And this plugin generates a lot of them.");
 		const sounds = Object.values(soundlist.split("\n"));
