@@ -15,7 +15,7 @@ Activates functions. Mode 1 triggers can be executed in a code line, however the
 ### message:
 Args: (text).
 
-Sends a message to the player. If your message doesn't fit in one codeblock you can extend them by stacking.
+Sends a message to the player. If your message doesn't fit in one codeblock you can extend them by stacking. Can also display variables with stacking 'setvariable' on top of it.
 
 ## kill:
 Args: (none).
@@ -76,6 +76,36 @@ Activates functions whenever a player is inside of one. To resize the zone simpl
 Args: (mode)(function name)
 
 Prevents functions from running. Mode 0 disables functions. Mode 1 reenables them.
+
+### setvariable:
+Args: (amount)(variable name)
+
+Sets variables to a value. If the variable doesn't exist it will create it.
+
+### addvariable:
+Args: (amount)(variable name)
+
+Adds to the variable's value.
+
+### multvariable:
+Args: (amount)(variable name)
+
+Multiplies the variable.
+
+### divvariable:
+Args: (amount)(variable name)
+
+Divides the variable.
+
+### remvariable:
+Args: (variable name)
+
+Deletes the variable.
+
+### compare:
+Args: (invert mode)(compare mode)
+
+Compares 2 variables/values on top of it by using 'setvariable'. Setting invert mode to 1 will invert the output. Compare mode 0 checks if variables are equal. Compare mode 1 checks if the first variable greater than the second. If the variable doesn't exist it will take the amount from 'setvariable'.
 
 ## Planned features:
 - [X] Doors.
