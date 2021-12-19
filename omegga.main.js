@@ -8,9 +8,9 @@ const healbrick = brs.read(brsfile);
 brsfile = fs.readFileSync(__dirname + "/brs/audio.brs");
 const soundbrick = brs.read(brsfile);
 const soundlist = fs.readFileSync(__dirname + "/misc/Sound_list.txt", 'utf8');
-const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone","blacklist"];
-const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~","bl~"];
-const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11];
+const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone","blacklist","setvariable","addvariable","multvariable","divvariable","remvariable","compare"];
+const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~","bl~","sv~","av~","mv~","dv~","rv~","cpr~"];
+const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11,65,66,66,66,65,68];
 const collideoptions = [{ player: false, weapon: false, interaction: false, tool: true },{ player: true, weapon: true, interaction: true, tool: true }];
 let trusted = [];
 let blacklist = [];
@@ -86,6 +86,17 @@ class Interactables {
 										text = text + description3.split("_").join(" ");
 										detected2 = true;
 									}
+									if(description3[0] == "sv") {
+										description3.shift(); description3.shift();
+										for(var a=0;a<variables.length;a++) {
+											if(variables[a].name == description3[0]) {
+												const amount = variables[a].amount;
+												a = variables.length;
+												text = text + amount.toString();
+											}
+										}
+										detected2 = true;
+									}
 								}
 								
 							}
@@ -118,12 +129,113 @@ class Interactables {
 							}
 							this.omegga.broadcast(text);
 						}
+						if(description2[0] == "cpr") {
+							let funcpos2 = [funcpos[0]+10,funcpos[1]-10,funcpos[2]];
+							let detected2 = true;
+							let vartocompare = [];
+							while(detected2) {
+							detected2 = false;
+							for(var i3=0;i3<brsobj.brick_count;i3++) {
+								if(brsobj.bricks[i3].position[0] == funcpos2[0] && brsobj.bricks[i3].position[1] == funcpos2[1] && brsobj.bricks[i3].position[2] == funcpos2[2]) {	
+									const brickowner3 = brsobj.brick_owners[brsobj.bricks[i3].owner_index - 1].name;
+									let description3 = brickowner3.split("~");
+									if(description3[0] == "sv") {
+										for(var a=0;a<variables.length;a++) {
+											if(variables[a].name == description3[2]) {
+												const amount = variables[a].amount;
+												a = variables.length;
+												vartocompare.push(amount);
+											}
+											else {
+												vartocompare.push(parseInt(description3[1],10));
+											}
+										}
+										if(!vartocompare.length<2) {
+											detected2 = true;
+										}
+									}
+								}
+								
+							}
+							funcpos2 = [funcpos2[0],funcpos2[1]-10,funcpos2[2]];
+							}
+							let bool = false;
+							if(vartocompare[0] == vartocompare[1] && description2[2] == 0) {
+								bool = true;
+							}
+							else if(vartocompare[0] > vartocompare[1] && description2[2] == 1) {
+								bool = true;
+							}
+							if(description2[1] == 1) {
+								bool = !bool;
+							}
+							if(!bool) {
+								funcpos = [funcpos[0], funcpos[1]+20, funcpos[2]];
+							}
+						}
 						if(description2[0] == "kl") {
 							this.omegga.writeln(`Chat.Command /TP "${name}" ${[100000000,0,0].join(" ")}`);
 						}
 						if(description2[0] == "tp") {
 							const pos = description2[1].split(",");
 							this.omegga.writeln(`Chat.Command /TP "${name}" ${pos.join(" ")}`);
+						}
+						if(description2[0] == "sv") {
+							let alreadyexists = false;
+							if(variables.length > 0) {
+								if(variables.some(a => a.name == description2[2])) {
+									alreadyexists = true;
+								}
+							}
+							if(!alreadyexists) {
+								const amount = parseInt(description2[1],10);
+								const varname = description2[2];
+								variables.push({name: varname, amount: amount});
+							}
+							else {
+								for(var a=0;a<variables.length;a++) {
+									if(variables[a].name == description2[2]) {
+										const amount = parseInt(description2[1],10);
+										variables[a] = {name: variables[a].name, amount: amount};
+										a = variables.length;
+									}
+								}
+							}
+						}
+						if(description2[0] == "av") {
+							for(var a=0;a<variables.length;a++) {
+								if(variables[a].name == description2[2]) {
+									const amount = variables[a].amount + parseInt(description2[1],10);
+									variables[a] = {name: variables[a].name, amount: amount};
+									a = variables.length;
+								}
+							}
+						}
+						if(description2[0] == "mv") {
+							for(var a=0;a<variables.length;a++) {
+								if(variables[a].name == description2[2]) {
+									const amount = variables[a].amount * parseInt(description2[1],10);
+									variables[a] = {name: variables[a].name, amount: amount};
+									a = variables.length;
+								}
+							}
+						}
+						if(description2[0] == "dv") {
+							for(var a=0;a<variables.length;a++) {
+								if(variables[a].name == description2[2]) {
+									const amount = variables[a].amount / parseInt(description2[1],10);
+									variables[a] = {name: variables[a].name, amount: amount};
+									a = variables.length;
+								}
+							}
+						}
+						if(description2[0] == "rv") {
+							for(var a=0;a<variables.length;a++) {
+								if(variables[a].name == description2[1]) {
+									variables.splice(a,1);
+									a = variables.length;
+								}
+							}
 						}
 						if(description2[0] == "hl") {
 							function removbrik(omegga) {
@@ -243,6 +355,7 @@ class Interactables {
 	}
 
 	async init() {
+	trusted.push(this.omegga.host);
 		console.warn("DO NOT FORGET TO CLEAR TEMP FILES FROM YOUR SAVES FOLDER.");
 		console.log("Trust me you don't want to endup with 300k files like it happened to me. And this plugin generates a lot of them.");
 		const sounds = Object.values(soundlist.split("\n"));
@@ -279,7 +392,6 @@ class Interactables {
 						if(brickpos[0]<plyrpos[0]+25 && brickpos[0]>plyrpos[0]-25 && brickpos[1]<plyrpos[1]+25 && brickpos[1]>plyrpos[1]-25 && brickpos[2]<plyrpos[2]+36 && brickpos[2]>plyrpos[2]-28) {
 								const valuecheck = brickowner.split("~");
 								if(!isdead && valuecheck[1] == "0") {
-									//this.omegga.whisper(name,"test");
 									this.runfunctionsnstuff(brsobj,plyrpos,brickowner,name,sounds);
 								}
 								foundtriggers = true;
@@ -318,18 +430,18 @@ class Interactables {
 			}
 			if(brickfuncs.includes(args[0])) {
 				let description = brickfuncsshort[brickfuncs.indexOf(args[0])];
-				if(description == "fn~" || description == "ms~" || description == "door~" || description == "br~" || description == "zn~") {
+				if(description == "fn~" || description == "ms~" || description == "door~" || description == "br~" || description == "zn~" || description == "rv~") {
 					args.shift();
 					description = description + args.join("_");
 				}
-				if(description == "tp~" || description == "rt~" || description == "ps~" || description == "rp~") {
+				if(description == "tp~" || description == "rt~" || description == "ps~" || description == "rp~" || description == "cpr~") {
 					args.shift();
 					args.map(function (x) {
 						return parseInt(x, 10);
 					});
 					args.forEach(element =>
 					checkifnan(element));
-					if(description !== "ps~" && description !== "rp~") {
+					if(description !== "ps~" && description !== "rp~" && description !== "cpr~") {
 						description = description + args.join(",");
 					}
 					else {
@@ -339,7 +451,7 @@ class Interactables {
 						}
 					}
 				}
-				if(description == "tr~" || description == "ud~" || description == "bl~") {
+				if(description == "tr~" || description == "ud~" || description == "bl~" || description == "sv~" || description == "av~" || description == "mv~" || description == "dv~") {
 					description = description + parseInt(args[1],10) + "~";
 					checkifnan(parseInt(args[1],10));
 					args.shift(); args.shift();
@@ -369,12 +481,27 @@ class Interactables {
 			blacklist = [];
 			this.omegga.whisper(name,"Blacklist cleared.");
 		});
-		this.omegga.on('cmd:test', async name => {
-			const minigames = await this.omegga.getMinigames();
-			this.omegga.whisper(name,minigames);
+		this.omegga.on('cmd:clearvariables', async name => {
+			variables = [];
+			this.omegga.whisper(name,"Variables cleared.");
 		});
+		this.omegga.on('cmd:listvariables', async name => {
+			this.omegga.whisper(name,"---VARIABLES---");
+			Object.values(variables).forEach(element =>
+			this.omegga.whisper(name,element.name + ": " + element.amount));
+			this.omegga.whisper(name,"Pgup n' Pgdn to scroll.");
+		});
+		this.omegga.on('cmd:listblacklisted', async name => {
+			this.omegga.whisper(name,"---BLACKLISTED---");
+			this.omegga.whisper(name,blacklist);
+			this.omegga.whisper(name,"Pgup n' Pgdn to scroll.");
+		});
+		//this.omegga.on('cmd:test', async name => {
+			//const minigames = await this.omegga.getMinigames();
+			//this.omegga.whisper(name,minigames);
+		//});
 		this.interval = setInterval(() => this.tickhandler(),1000);
-		return { registeredCommands: ['place','use','clearblacklist','test'] };
+		return { registeredCommands: ['place','use','clearblacklist','clearvariables','listvariables','listblacklisted'] };
 	}
 
 
@@ -395,7 +522,6 @@ class Interactables {
 						if(typeof brickowner !== 'undefined') {
 						if(brickowner.indexOf("zn~") == 0) {
 							const rotation = brsobj.bricks[i2].rotation;
-							//console.log(rotation);
 							const brickpos = brsobj.bricks[i2].position;
 							let size = brsobj.bricks[i2].size;
 							if(rotation%2 == 1) {
@@ -417,8 +543,10 @@ class Interactables {
 		clearInterval(this.interval);
 		this.omegga.removeAllListeners('cmd:use');
 		this.omegga.removeAllListeners('cmd:place');
-		this.omegga.removeAllListeners('cmd:test');
 		this.omegga.removeAllListeners('cmd:clearblacklist');
+		this.omegga.removeAllListeners('cmd:clearvariables');
+		this.omegga.removeAllListeners('cmd:listvariables');
+		this.omegga.removeAllListeners('cmd:listblacklisted');
 	}
 }
 module.exports = Interactables;
