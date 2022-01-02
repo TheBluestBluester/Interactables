@@ -122,6 +122,17 @@ class Interactables {
 										text = text + description3.split("_").join(" ");
 										detected2 = true;
 									}
+									if(description3[0] == "sv") {
+										description3.shift(); description3.shift();
+										for(var a=0;a<variables.length;a++) {
+											if(variables[a].name == description3[0]) {
+												const amount = variables[a].amount;
+												a = variables.length;
+												text = text + amount.toString();
+											}
+										}
+										detected2 = true;
+									}
 								}
 								
 							}
@@ -287,7 +298,26 @@ class Interactables {
 						if(description2[0] == "rp") {
 							if(description2[1] == "0") {
 								looplist.push(funcpos);
-								looplist.push(parseInt(description2[2], 10)-1);
+								let variable  = parseInt(description2[2],10);
+								for(var i3=0;i3<brsobj.brick_count;i3++) {
+									if(brsobj.bricks[i3].position[0] == funcpos[0]+10 && brsobj.bricks[i3].position[1] == funcpos[1]-10 && brsobj.bricks[i3].position[2] == funcpos[2]) {
+										const brickowner3 = brsobj.brick_owners[brsobj.bricks[i3].owner_index - 1].name;
+										let description3 = brickowner3.split("~");
+										if(description3[0] == "sv") {
+											description3.shift(); description3.shift();
+												for(var a=0;a<variables.length;a++) {
+													if(variables[a].name == description3[0]) {
+														const amount = variables[a].amount;
+														a = variables.length;
+														variable = amount;
+													}
+												}
+										}
+										i3 = brsobj.brick_count;
+									}
+								
+								}
+								looplist.push(variable - 1);
 							}
 							else {
 								if(looplist[looplist.length-1] > 0) {
@@ -496,12 +526,27 @@ class Interactables {
 			this.omegga.whisper(name,blacklist);
 			this.omegga.whisper(name,"Pgup n' Pgdn to scroll.");
 		});
-		//this.omegga.on('cmd:test', async name => {
-			//const minigames = await this.omegga.getMinigames();
-			//this.omegga.whisper(name,minigames);
+		
+		//Future command comming soonTM
+		
+		//this.omegga.on('cmd:door', async (name, ...args) => {
+			//function random(min, max) {
+				//return Math.floor(Math.random() * (max + 1 - min) + min);
+			//}
+			//let description = "door~" + args[0];
+			//let doorbrs = this.omegga.getTemplateBoundsData(name);
+			//const randomcode = random(100000000000,999999999999);
+			//doorbrs = {...doorbrs,brick_owners:[{id: "00000000-0000-0000-0000-"+randomcode.toString(),name: description,bricks: 0}]};
+			//this.omegga.getPlayer(name).loadDataAtGhostBrick(doorbrs);
+			//this.omegga.whisper(name,"Door created.");
 		//});
+		
+		////this.omegga.on('cmd:test', async name => {
+			////const minigames = await this.omegga.getMinigames();
+			////this.omegga.whisper(name,minigames);
+		////});
 		this.interval = setInterval(() => this.tickhandler(),1000);
-		return { registeredCommands: ['place','use','clearblacklist','clearvariables','listvariables','listblacklisted'] };
+		return { registeredCommands: ['place','use','clearblacklist','clearvariables','listvariables','listblacklisted','door'] };
 	}
 
 
