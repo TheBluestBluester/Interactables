@@ -15,7 +15,7 @@ Activates functions. Mode 1 triggers can be executed in a code line, however the
 ### message:
 Args: (text).
 
-Sends a message to the player. If your message doesn't fit in one codeblock you can extend them by stacking. Can also display variables with stacking 'setvariable' on top of it.
+Sends a message to the player. If your message doesn't fit in one codeblock you can extend them by stacking. Can also display variables by stacking 'setvariable' on top of it.
 
 ## kill:
 Args: (none).
@@ -45,7 +45,7 @@ Delays all codeblocks after it. 1 second is 1000 ticks.
 ### broadcast:
 Args: (text).
 
-Sends a message to all players. If your message doesn't fit in one codeblock you can extend them by stacking.
+Sends a message but it sends the message to all players.
 
 ### playsound:
 Args: (id)(volume)(pitch)(duration) optional: (x)(y)(z).
@@ -55,7 +55,7 @@ Plays sound. If coords are not specified sound will be played at player's positi
 ### repeat:
 Args: (mode number)(amount).
 
-Repeats codeblocks. Mode 0 blocks will act as a start of a loop. Mode 1 blocks will act as an end of a loop.
+Repeats codeblocks. Mode 0 blocks will act as a start of a loop. Mode 1 blocks will act as an end of a loop. If there is a "setvariable" codeblock on top of it it will repeat for the amount that the variable is set.
 
 ### door:
 Args: (name).
