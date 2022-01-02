@@ -38,6 +38,24 @@
       "description": "Clear blacklist.",
       "example": "clearblacklist",
       "args": []
+    },
+    {
+      "name": "/clearvariables",
+      "description": "Clear all variables.",
+      "example": "clearvariables",
+      "args": []
+    },
+    {
+      "name": "/listblacklisted",
+      "description": "Lists all blacklisted functions.",
+      "example": "listblacklisted",
+      "args": []
+    },
+    {
+      "name": "/listvariables",
+      "description": "Lists all variables.",
+      "example": "listvariables",
+      "args": []
     }
   ]
 }
