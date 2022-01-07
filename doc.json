@@ -7,6 +7,16 @@
       "description": "Players that you trust to place down codeblocks.",
       "default": [],
       "type": "players"
+    },
+    "UpdateFrequency": {
+      "description": "How fast the plugin checks for zones. Frequency is in seconds.",
+      "default": 1,
+      "type": "number"
+    },
+    "DisableZones": {
+      "description": "Disables zones.",
+      "default": false,
+      "type": "boolean"
     }
   },
   "commands": [
