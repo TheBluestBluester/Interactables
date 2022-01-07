@@ -45,7 +45,7 @@ Delays all codeblocks after it. 1 second is 1000 ticks.
 ### broadcast:
 Args: (text).
 
-Sends a message but it sends the message to all players.
+Same as message codeblock but it sends the message to all players.
 
 ### playsound:
 Args: (id)(volume)(pitch)(duration) optional: (x)(y)(z).
