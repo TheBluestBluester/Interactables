@@ -107,9 +107,14 @@ Args: (invert mode)(compare mode)
 
 Compares 2 variables/values on top of it by using 'setvariable'. Setting invert mode to 1 will invert the output. Compare mode 0 checks if variables are equal. Compare mode 1 checks if the first variable greater than the second. If the variable doesn't exist it will take the amount from 'setvariable'. If the output is negative it will trigger codeblocks that are below by 2 bricks.
 
+### weapon
+Args: (id)
+
+Gives a weapon to the player.
+
 ## Planned features:
 - [X] Doors.
-- [ ] Item spawning.
+- [X] Item spawning.
 - [X] Zones.
 - [ ] Minigame event triggers.
 - [ ] Variables and condition blocks. (WIP)
