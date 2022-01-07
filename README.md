@@ -115,3 +115,4 @@ Compares 2 variables/values on top of it by using 'setvariable'. Setting invert 
 - [ ] Variables and condition blocks. (WIP)
 - [X] Function blacklisting.
 - [X] Message extention.
+- [ ] Event cancellation.
