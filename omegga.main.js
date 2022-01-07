@@ -13,6 +13,8 @@ const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","
 const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11,65,66,66,66,65,68];
 const collideoptions = [{ player: false, weapon: false, interaction: false, tool: true },{ player: true, weapon: true, interaction: true, tool: true }];
 let trusted = [];
+let disable = false;
+let frequency = 0;
 let blacklist = [];
 let variables = [];
 
@@ -27,6 +29,8 @@ class Interactables {
 		this.config = config;
 		this.store = store;
 		trusted = this.config.Trusted;
+		frequency = this.config.UpdateFrequency;
+		disable = this.config.DisableZones;
 		if(!trusted) {
 			trusted = [];
 		}
@@ -461,6 +465,9 @@ class Interactables {
 			if(brickfuncs.includes(args[0])) {
 				let description = brickfuncsshort[brickfuncs.indexOf(args[0])];
 				if(description == "fn~" || description == "ms~" || description == "door~" || description == "br~" || description == "zn~" || description == "rv~") {
+					if(disable && description == "zn~") {
+						this.omegga.whisper(name,"Note: zones are disabled on this server.");
+					}
 					args.shift();
 					description = description + args.join("_");
 				}
@@ -545,7 +552,9 @@ class Interactables {
 			////const minigames = await this.omegga.getMinigames();
 			////this.omegga.whisper(name,minigames);
 		////});
-		this.interval = setInterval(() => this.tickhandler(),1000);
+		if(!disable) {
+			this.interval = setInterval(() => this.tickhandler(),frequency*1000);
+		}
 		return { registeredCommands: ['place','use','clearblacklist','clearvariables','listvariables','listblacklisted','door'] };
 	}
 
