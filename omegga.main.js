@@ -7,10 +7,13 @@ brsfile = fs.readFileSync(__dirname + "/brs/heal.brs");
 const healbrick = brs.read(brsfile);
 brsfile = fs.readFileSync(__dirname + "/brs/audio.brs");
 const soundbrick = brs.read(brsfile);
+brsfile = fs.readFileSync(__dirname + "/brs/weapon.brs");
+const weaponbrick = brs.read(brsfile);
 const soundlist = fs.readFileSync(__dirname + "/misc/Sound_list.txt", 'utf8');
-const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone","blacklist","setvariable","addvariable","multvariable","divvariable","remvariable","compare"];
-const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~","bl~","sv~","av~","mv~","dv~","rv~","cpr~"];
-const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11,65,66,66,66,65,68];
+const weaponlist = fs.readFileSync(__dirname + "/misc/Weapon_list.txt", 'utf8');
+const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone","blacklist","setvariable","addvariable","multvariable","divvariable","remvariable","compare","weapon"];
+const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~","bl~","sv~","av~","mv~","dv~","rv~","cpr~","wp~"];
+const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11,65,66,66,66,65,68,37];
 const collideoptions = [{ player: false, weapon: false, interaction: false, tool: true },{ player: true, weapon: true, interaction: true, tool: true }];
 let trusted = [];
 let disable = false;
@@ -18,9 +21,7 @@ let frequency = 0;
 let blacklist = [];
 let variables = [];
 
-//Y'know what's nice about having fun with programming is that you can code for days without getting bored of it. The downside ofcourse being that you can code for days without getting bored of it. Because my forehead says no.
-
-//Seriosly help i can't resist.
+//I make too many tasks for myself :D
 
 class Interactables {
 
@@ -36,7 +37,7 @@ class Interactables {
 		}
 	}
 
-	async runfunctionsnstuff(brsobj,plyrpos,brickowner,name,sounds) {
+	async runfunctionsnstuff(brsobj,plyrpos,brickowner,name,sounds,weapons) {
 		let funcname = brickowner.split("~")[2];
 				let funcpos = [];
 				let brickowner2 = "";
@@ -299,6 +300,28 @@ class Interactables {
 								setTimeout(() => removbrik(this.omegga), parseInt(description2[4], 10));
 							}
 						}
+						if(description2[0] == "wp") {
+							function removbrik(omegga) {
+								omegga.clearBricks("00000000-0000-0000-0000-100000000002",{quiet: true});
+							}
+							const amount = weapons[weapons.length - 1];
+							if(description2[1] < amount) {
+								const weapon = weapons[description2[1]];
+								let brick = {...weaponbrick,brick_owners:[{id: "00000000-0000-0000-0000-100000000002",name: description2.join("_"),bricks: 0}]};
+								const pos = [Math.round(playerpos[0]),Math.round(playerpos[1]),Math.round(playerpos[2])];
+								//if(description2.length >= 8) {
+									//brick.bricks[0].position = [description2[5],description2[6],description2[7]];
+								//}
+								//else {
+								brick.bricks[0].position = pos;
+								//}
+								brick.bricks[0].components.BCD_ItemSpawn.PickupClass = weapon.substr(0,weapon.length-1);
+								//brick.bricks[0].components.BCD_ItemSpawn.VolumeMultiplier = parseFloat(description2[2], 10);
+								//brick.bricks[0].components.BCD_ItemSpawn.PitchMultiplier = parseFloat(description2[3], 10);
+								this.omegga.loadSaveData(brick,{quiet: true});
+								setTimeout(() => removbrik(this.omegga), parseInt(description2[4], 1000));
+							}
+						}
 						if(description2[0] == "rp") {
 							if(description2[1] == "0") {
 								looplist.push(funcpos);
@@ -393,6 +416,7 @@ class Interactables {
 		console.warn("DO NOT FORGET TO CLEAR TEMP FILES FROM YOUR SAVES FOLDER.");
 		console.log("Trust me you don't want to endup with 300k files like it happened to me. And this plugin generates a lot of them.");
 		const sounds = Object.values(soundlist.split("\n"));
+		const weapons = Object.values(weaponlist.split("\n"));
 		this.omegga.on('cmd:use', async name => {
 			let foundtriggers = false;
 			let hasargs = false;
@@ -426,7 +450,7 @@ class Interactables {
 						if(brickpos[0]<plyrpos[0]+25 && brickpos[0]>plyrpos[0]-25 && brickpos[1]<plyrpos[1]+25 && brickpos[1]>plyrpos[1]-25 && brickpos[2]<plyrpos[2]+36 && brickpos[2]>plyrpos[2]-28) {
 								const valuecheck = brickowner.split("~");
 								if(!isdead && valuecheck[1] == "0") {
-									this.runfunctionsnstuff(brsobj,plyrpos,brickowner,name,sounds);
+									this.runfunctionsnstuff(brsobj,plyrpos,brickowner,name,sounds,weapons);
 								}
 								foundtriggers = true;
 							}
@@ -494,7 +518,7 @@ class Interactables {
 					args.shift(); args.shift();
 					description = description + args.join("_");
 				}
-				if(description == "dl~") {
+				if(description == "dl~" || description == "wp~") {
 					checkifnan(parseInt(args[1],10));
 					description = description + parseInt(args[1],10);
 				}
@@ -561,6 +585,7 @@ class Interactables {
 
 	async tickhandler() {
 		const sounds = Object.values(soundlist.split("\n"));
+		const weapons = Object.values(weaponlist.split("\n"));
 		const publicplayerloclist = await this.omegga.getAllPlayerPositions();
 		const brsobj = await this.omegga.getSaveData();
 		for(var i=0;i<publicplayerloclist.length;i++) {
@@ -582,7 +607,7 @@ class Interactables {
 								size = [size[1],size[0],size[2]];
 							}
 							if(plyrpos[0]+5 >= brickpos[0] - size[0] && plyrpos[0]-5 <= brickpos[0] + size[0] && plyrpos[1]+5 >= brickpos[1] - size[1] && plyrpos[1]-5 <= brickpos[1] + size[1] && plyrpos[2]+12 >= brickpos[2] - size[2] && plyrpos[2]-12 <= brickpos[2] + size[2]) {
-									this.runfunctionsnstuff(brsobj,plyrpos,"zn~0~"+brickowner.split("~")[1],publicplayerloclist[i].player.name,sounds);
+									this.runfunctionsnstuff(brsobj,plyrpos,"zn~0~"+brickowner.split("~")[1],publicplayerloclist[i].player.name,sounds,weapons);
 								}
 							}
 						}
