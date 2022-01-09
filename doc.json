@@ -3,10 +3,15 @@
   "description": "Make your stuff interactable!",
   "author": "Bluester16",
   "config": {
-    "Trusted": {
+    "TrustedPlayers": {
       "description": "Players that you trust to place down codeblocks.",
       "default": [],
       "type": "players"
+    },
+    "TrustedRole": {
+      "description": "Role that you trust to place down codeblocks.",
+      "default": [],
+      "type": "role"
     },
     "UpdateFrequency": {
       "description": "How fast the plugin checks for zones. Frequency is in seconds.",
