@@ -11,11 +11,13 @@ brsfile = fs.readFileSync(__dirname + "/brs/weapon.brs");
 const weaponbrick = brs.read(brsfile);
 const soundlist = fs.readFileSync(__dirname + "/misc/Sound_list.txt", 'utf8');
 const weaponlist = fs.readFileSync(__dirname + "/misc/Weapon_list.txt", 'utf8');
-const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone","blacklist","setvariable","addvariable","multvariable","divvariable","remvariable","compare","weapon"];
-const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~","bl~","sv~","av~","mv~","dv~","rv~","cpr~","wp~"];
-const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11,65,66,66,66,65,68,37];
+const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone","blacklist","setvariable","addvariable","multvariable","divvariable","remvariable","compare","weapon","cancel"];
+const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~","bl~","sv~","av~","mv~","dv~","rv~","cpr~","wp~","cl~"];
+const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11,65,66,66,66,65,68,37,12];
 const collideoptions = [{ player: false, weapon: false, interaction: false, tool: true },{ player: true, weapon: true, interaction: true, tool: true }];
+let funcstocancel = [];
 let trusted = [];
+let currentlyexecuting = [];
 let disable = false;
 let frequency = 0;
 let blacklist = [];
@@ -62,13 +64,14 @@ class Interactables {
 					this.omegga.whisper(name,"The function that is bound to this trigger does not exist.");
 				}
 				let looplist = [];
-				while(detected && !blacklist.includes(funcname)) {
+				currentlyexecuting.push(funcname);
+				while(detected && !blacklist.includes(funcname) && !funcstocancel.includes(funcname)) {
 					playerpos = await this.omegga.getPlayer(name).getPosition();
 					detected = false;
 					function delay(ms) {
 						return new Promise(resolve => setTimeout(resolve, ms));
 					}
-					for(var i2=0;i2<brsobj.brick_count;i2++) {
+					for(var i2=0;i2<brsobj.brick_count && !funcstocancel.includes(funcname);i2++) {
 					if(brsobj.bricks[i2].position[0] == funcpos[0]+10 && brsobj.bricks[i2].position[1] == funcpos[1] && brsobj.bricks[i2].position[2] == funcpos[2]) {
 
 						brickowner2 = brsobj.brick_owners[brsobj.bricks[i2].owner_index - 1].name;
@@ -273,6 +276,11 @@ class Interactables {
 						if(description2[0] == "dl") {
 							await delay(parseInt(description2[1],10));
 						}
+						if(description2[0] == "cl") {
+							if(currentlyexecuting.includes(description2[1])) {
+								funcstocancel.push(description2[1]);
+							}
+						}
 						if(description2[0] == "tr") {
 							if(description2[1] == 1) {
 								this.runfunctionsnstuff(brsobj,plyrpos,description2.join("~"),name,sounds);
@@ -309,15 +317,8 @@ class Interactables {
 								const weapon = weapons[description2[1]];
 								let brick = {...weaponbrick,brick_owners:[{id: "00000000-0000-0000-0000-100000000002",name: description2.join("_"),bricks: 0}]};
 								const pos = [Math.round(playerpos[0]),Math.round(playerpos[1]),Math.round(playerpos[2])];
-								//if(description2.length >= 8) {
-									//brick.bricks[0].position = [description2[5],description2[6],description2[7]];
-								//}
-								//else {
 								brick.bricks[0].position = pos;
-								//}
 								brick.bricks[0].components.BCD_ItemSpawn.PickupClass = weapon.substr(0,weapon.length-1);
-								//brick.bricks[0].components.BCD_ItemSpawn.VolumeMultiplier = parseFloat(description2[2], 10);
-								//brick.bricks[0].components.BCD_ItemSpawn.PitchMultiplier = parseFloat(description2[3], 10);
 								this.omegga.loadSaveData(brick,{quiet: true});
 								setTimeout(() => removbrik(this.omegga), parseInt(description2[4], 1000));
 							}
@@ -409,6 +410,13 @@ class Interactables {
 					}
 				}
 			}
+			currentlyexecuting.splice(currentlyexecuting.indexOf(funcname));
+			if(funcstocancel.includes(funcname)) {
+				funcstocancel.splice(funcstocancel.indexOf(funcname));
+			}
+			if(funcstocancel.length < 1) {
+				funcstocancel = [];
+			}
 	}
 
 	async init() {
@@ -488,7 +496,7 @@ class Interactables {
 			}
 			if(brickfuncs.includes(args[0])) {
 				let description = brickfuncsshort[brickfuncs.indexOf(args[0])];
-				if(description == "fn~" || description == "ms~" || description == "door~" || description == "br~" || description == "zn~" || description == "rv~") {
+				if(description == "fn~" || description == "ms~" || description == "door~" || description == "br~" || description == "zn~" || description == "rv~" || description == "cl~") {
 					if(disable && description == "zn~") {
 						this.omegga.whisper(name,"Note: zones are disabled on this server.");
 					}
@@ -557,20 +565,32 @@ class Interactables {
 			this.omegga.whisper(name,blacklist);
 			this.omegga.whisper(name,"Pgup n' Pgdn to scroll.");
 		});
-		
-		//Future command comming soonTM
-		
-		//this.omegga.on('cmd:door', async (name, ...args) => {
-			//function random(min, max) {
-				//return Math.floor(Math.random() * (max + 1 - min) + min);
-			//}
-			//let description = "door~" + args[0];
-			//let doorbrs = this.omegga.getTemplateBoundsData(name);
-			//const randomcode = random(100000000000,999999999999);
-			//doorbrs = {...doorbrs,brick_owners:[{id: "00000000-0000-0000-0000-"+randomcode.toString(),name: description,bricks: 0}]};
-			//this.omegga.getPlayer(name).loadDataAtGhostBrick(doorbrs);
-			//this.omegga.whisper(name,"Door created.");
-		//});
+		this.omegga.on('cmd:stopall', async name => {
+			currentlyexecuting.forEach(element =>
+			funcstocancel.push(element));
+			this.omegga.whisper(name,"All functions canceled.");
+		});
+		this.omegga.on('cmd:door', async (name, ...args) => {
+			function random(min, max) {
+				return Math.floor(Math.random() * (max + 1 - min) + min);
+			}
+			let description = "door~" + args[0];
+			let doorbrs = await this.omegga.getPlayer(name).getTemplateBoundsData();
+			if(doorbrs != null && args[0] != null) {
+				const randomcode = random(100000000000,999999999999);
+				doorbrs = {...doorbrs,brick_owners:[{id: "00000000-0000-0000-0000-"+randomcode.toString(),name: description,bricks: 0}]};
+				this.omegga.getPlayer(name).loadDataAtGhostBrick(doorbrs);
+				this.omegga.whisper(name,"Door created.");
+			}
+			else {
+				if(args[0] == null) {
+					this.omegga.whisper(name,"Door name is missing.");
+				}
+				else {
+					this.omegga.whisper(name,"An error occured while place a door. Please try again.");
+				}
+			}
+		});
 		
 		////this.omegga.on('cmd:test', async name => {
 			////const minigames = await this.omegga.getMinigames();
@@ -579,7 +599,7 @@ class Interactables {
 		if(!disable) {
 			this.interval = setInterval(() => this.tickhandler(),frequency*1000);
 		}
-		return { registeredCommands: ['place','use','clearblacklist','clearvariables','listvariables','listblacklisted','door'] };
+		return { registeredCommands: ['place','use','clearblacklist','clearvariables','listvariables','listblacklisted','door','stopall'] };
 	}
 
 
@@ -616,7 +636,7 @@ class Interactables {
 			}
 		}
 	}
-
+	
 
 	async stop() {
 		clearInterval(this.interval);
@@ -626,6 +646,8 @@ class Interactables {
 		this.omegga.removeAllListeners('cmd:clearvariables');
 		this.omegga.removeAllListeners('cmd:listvariables');
 		this.omegga.removeAllListeners('cmd:listblacklisted');
+		this.omegga.removeAllListeners('cmd:stopall');
+		this.omegga.removeAllListeners('cmd:door');
 	}
 }
 module.exports = Interactables;
