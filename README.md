@@ -63,6 +63,7 @@ Repeats codeblocks. Mode 0 blocks will act as a start of a loop. Mode 1 blocks w
 Args: (name).
 
 Places a door.
+#### This is replaced with /door command which can place selected bricks as doors so use that instead.
 
 ### usedoor:
 Args: (mode)(door name).
@@ -118,6 +119,11 @@ Gives a weapon to the player.
 Args: (function name)
 
 Stops a selected function.
+
+### randomvariable:
+Args: (max value)(variable name)
+
+Sets the variable to a random value.
 
 ## Planned features:
 - [X] Doors.
