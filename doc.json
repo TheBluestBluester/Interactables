@@ -66,6 +66,24 @@
       "description": "Lists all variables.",
       "example": "listvariables",
       "args": []
+    },
+    {
+      "name": "/stopall",
+      "description": "Stops all functions.",
+      "example": "stopall",
+      "args": []
+    },
+    {
+      "name": "/door",
+      "description": "Places selected bricks with the selector as a door.",
+      "example": "door",
+      "args": [
+        {
+          "name": "door name",
+          "description": "Door's name.",
+          "required": true
+        }
+      ]
     }
   ]
 }
