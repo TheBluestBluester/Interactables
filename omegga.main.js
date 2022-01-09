@@ -11,9 +11,9 @@ brsfile = fs.readFileSync(__dirname + "/brs/weapon.brs");
 const weaponbrick = brs.read(brsfile);
 const soundlist = fs.readFileSync(__dirname + "/misc/Sound_list.txt", 'utf8');
 const weaponlist = fs.readFileSync(__dirname + "/misc/Weapon_list.txt", 'utf8');
-const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone","blacklist","setvariable","addvariable","multvariable","divvariable","remvariable","compare","weapon","cancel"];
-const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~","bl~","sv~","av~","mv~","dv~","rv~","cpr~","wp~","cl~"];
-const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11,65,66,66,66,65,68,37,12];
+const brickfuncs = ["function","trigger","message","kill","teleport","tp","rltp","heal","door","usedoor","delay","broadcast","playsound","repeat","zone","blacklist","setvariable","addvariable","multvariable","divvariable","remvariable","compare","weapon","cancel","randomvariable"];
+const brickfuncsshort = ["fn~","tr~","ms~","kl","tp~","tp~","rt~","hl","door~","ud~","dl~","br~","ps~","rp~","zn~","bl~","sv~","av~","mv~","dv~","rv~","cpr~","wp~","cl~","rng~"];
+const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11,65,66,66,66,65,68,37,12,66];
 const collideoptions = [{ player: false, weapon: false, interaction: false, tool: true },{ player: true, weapon: true, interaction: true, tool: true }];
 let funcstocancel = [];
 let trusted = [];
@@ -215,6 +215,26 @@ class Interactables {
 								for(var a=0;a<variables.length;a++) {
 									if(variables[a].name == description2[2]) {
 										const amount = parseInt(description2[1],10);
+										variables[a] = {name: variables[a].name, amount: amount};
+										a = variables.length;
+									}
+								}
+							}
+						}
+						if(description2[0] == "rng") {
+							function random(max) {
+								return Math.floor(Math.random() * max);
+							}
+							let alreadyexists = false;
+							if(variables.length > 0) {
+								if(variables.some(a => a.name == description2[2])) {
+									alreadyexists = true;
+								}
+							}
+							if(alreadyexists) {
+								for(var a=0;a<variables.length;a++) {
+									if(variables[a].name == description2[2]) {
+										const amount = random(parseInt(description2[1],10));
 										variables[a] = {name: variables[a].name, amount: amount};
 										a = variables.length;
 									}
@@ -520,7 +540,7 @@ class Interactables {
 						}
 					}
 				}
-				if(description == "tr~" || description == "ud~" || description == "bl~" || description == "sv~" || description == "av~" || description == "mv~" || description == "dv~") {
+				if(description == "tr~" || description == "ud~" || description == "bl~" || description == "sv~" || description == "av~" || description == "mv~" || description == "dv~" || description == "rng~") {
 					description = description + parseInt(args[1],10) + "~";
 					checkifnan(parseInt(args[1],10));
 					args.shift(); args.shift();
