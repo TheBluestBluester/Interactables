@@ -17,6 +17,7 @@ const colorlist = [19,53,15,13,43,43,42,17,0,9,11,14,20,33,12,11,65,66,66,66,65,
 const collideoptions = [{ player: false, weapon: false, interaction: false, tool: true },{ player: true, weapon: true, interaction: true, tool: true }];
 let funcstocancel = [];
 let trusted = [];
+let roles = "";
 let currentlyexecuting = [];
 let disable = false;
 let frequency = 0;
@@ -31,7 +32,8 @@ class Interactables {
 		this.omegga = omegga;
 		this.config = config;
 		this.store = store;
-		trusted = this.config.Trusted;
+		trusted = this.config.TrustedPlayers;
+		roles = this.config.TrustedRole;
 		frequency = this.config.UpdateFrequency;
 		disable = this.config.DisableZones;
 		if(!trusted) {
@@ -500,6 +502,11 @@ class Interactables {
 					await this.omegga.whisper(name,"You are not trusted enouph to place codeblocks.");
 					return;
 				}
+			}
+			const rolelist = this.omegga.getPlayer(name).getRoles();
+			if(!rolelist.includes(roles) && roles != "") {
+				await this.omegga.whisper(name,"You are not trusted enouph to place codeblocks.");
+				return;
 			}
 			function random(min, max) {
 				return Math.floor(Math.random() * (max + 1 - min) + min);
