@@ -1,5 +1,7 @@
 # Interactables
-Plugin for omegga. Create stuff with codeblocks n... That.
+Plugin for omegga. Make things interactable! Create doors, create music, create games!
+
+### This plugin may heavily impact your server's performance. If that's the case slow down the zone check updates or disable them entirely.
 
 ## Codeblocks i guess:
 ### function:
@@ -112,12 +114,17 @@ Args: (id)
 
 Gives a weapon to the player.
 
+### cancel:
+Args: (function name)
+
+Stops a selected function.
+
 ## Planned features:
 - [X] Doors.
 - [X] Item spawning.
 - [X] Zones.
-- [ ] Minigame event triggers.
-- [ ] Variables and condition blocks. (WIP)
+- [ ] Event triggers.
+- [X] Variables and condition blocks.
 - [X] Function blacklisting.
 - [X] Message extention.
-- [ ] Event cancellation.
+- [X] Event cancellation.
