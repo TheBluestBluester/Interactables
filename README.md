@@ -17,7 +17,7 @@ Activates functions. Mode 1 triggers can be executed in a code line, however the
 ### message:
 Args: (text).
 
-Sends a message to the player. If your message doesn't fit in one codeblock you can extend them by stacking. Can also display variables by stacking 'setvariable' on top of it.
+Sends a message to the player. If your message doesn't fit in one codeblock you can extend them by stacking more message block to the left. Can also display variables by stacking 'setvariable' the same way.
 
 ## kill:
 Args: (none).
