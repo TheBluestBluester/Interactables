@@ -315,9 +315,11 @@ class Interactables {
 							const amount = sounds[sounds.length - 1];
 							if(description2[1] < amount) {
 								const sound = sounds[description2[1]];
+								console.log(sound);
 								let brick = {...soundbrick,brick_owners:[{id: "00000000-0000-0000-0000-100000000001",name: description2.join("_"),bricks: 0}]};
 								const pos = [Math.round(playerpos[0]),Math.round(playerpos[1]),Math.round(playerpos[2])];
-								if(description2.length >= 8) {
+								console.log(pos);
+								if(description2.length == 8) {
 									brick.bricks[0].position = [description2[5],description2[6],description2[7]];
 								}
 								else {
@@ -326,6 +328,7 @@ class Interactables {
 								brick.bricks[0].components.BCD_AudioEmitter.AudioDescriptor = sound.substr(0,sound.length-1);
 								brick.bricks[0].components.BCD_AudioEmitter.VolumeMultiplier = parseFloat(description2[2], 10);
 								brick.bricks[0].components.BCD_AudioEmitter.PitchMultiplier = parseFloat(description2[3], 10);
+								console.log(brick);
 								this.omegga.loadSaveData(brick,{quiet: true});
 								setTimeout(() => removbrik(this.omegga), parseInt(description2[4], 10));
 							}
@@ -598,14 +601,16 @@ class Interactables {
 			this.omegga.whisper(name,"All functions canceled.");
 		});
 		this.omegga.on('cmd:door', async (name, ...args) => {
+			let doorbrs = await this.omegga.getPlayer(name).getTemplateBoundsData();
 			function random(min, max) {
 				return Math.floor(Math.random() * (max + 1 - min) + min);
 			}
 			let description = "door~" + args[0];
-			let doorbrs = await this.omegga.getPlayer(name).getTemplateBoundsData();
+			console.log(doorbrs);
 			if(doorbrs != null && args[0] != null) {
 				const randomcode = random(100000000000,999999999999);
 				doorbrs = {...doorbrs,brick_owners:[{id: "00000000-0000-0000-0000-"+randomcode.toString(),name: description,bricks: 0}]};
+				console.log(doorbrs);
 				this.omegga.getPlayer(name).loadDataAtGhostBrick(doorbrs);
 				this.omegga.whisper(name,"Door created.");
 			}
@@ -619,10 +624,13 @@ class Interactables {
 			}
 		});
 		
-		////this.omegga.on('cmd:test', async name => {
-			////const minigames = await this.omegga.getMinigames();
-			////this.omegga.whisper(name,minigames);
-		////});
+		//this.omegga.on('cmd:test', async name => {
+			//const minigames = await this.omegga.getMinigames();
+			//this.omegga.whisper(name,`GetAll BP_PlayerController_C Pawn Name=${minigames[0].ruleset}`);
+			//this.omegga.writeln(`GetAll BP_PlayerController_C Pawn Name=${minigames[1].ruleset}`);
+			//Object.values(minigames).forEach(element =>
+			//console.log(element));
+		//});
 		if(!disable) {
 			this.interval = setInterval(() => this.tickhandler(),frequency*1000);
 		}
@@ -675,6 +683,7 @@ class Interactables {
 		this.omegga.removeAllListeners('cmd:listblacklisted');
 		this.omegga.removeAllListeners('cmd:stopall');
 		this.omegga.removeAllListeners('cmd:door');
+		this.omegga.removeAllListeners('cmd:test');
 	}
 }
 module.exports = Interactables;
