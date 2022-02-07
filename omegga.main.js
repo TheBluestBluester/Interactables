@@ -607,7 +607,7 @@ class Interactables {
 				const randomcode = random(100000000000,999999999999);
 				doorbrs = {...doorbrs,brick_owners:[{id: "00000000-0000-0000-0000-"+randomcode.toString(),name: description,bricks: 0}]};
 				for(var i=0;i<doorbrs.bricks.length;i++) {
-					doorbrs.bricks[i].owner_index = 0;
+					doorbrs.bricks[i].owner_index = 1;
 				}
 				this.omegga.whisper(name,"Door created.");
 				this.omegga.getPlayer(name).loadDataAtGhostBrick(doorbrs);
